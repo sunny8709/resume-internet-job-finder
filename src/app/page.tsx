@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { Upload, Search, Send, BarChart3, LogOut, User } from "lucide-react"
+import { Upload, Search, Send, BarChart3, LogOut, User, Sparkles, Zap } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { toast } from "@/hooks/use-toast"
@@ -185,10 +185,10 @@ export default function Home() {
 
   if (isPending || isLoadingData) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5 flex items-center justify-center">
         <div className="text-center">
-          <div className="h-12 w-12 mx-auto mb-4 rounded-full border-4 border-primary border-t-transparent animate-spin" />
-          <p className="text-muted-foreground">Loading your data...</p>
+          <div className="h-16 w-16 mx-auto mb-6 rounded-full border-4 border-primary/30 border-t-primary animate-spin" />
+          <p className="text-lg font-medium text-muted-foreground">Loading your workspace...</p>
         </div>
       </div>
     )
@@ -197,25 +197,43 @@ export default function Home() {
   if (!session?.user) return null
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
-      {/* Header */}
-      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold">JobAutoApply</h1>
-              <p className="text-muted-foreground">Automated job application system</p>
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5">
+      {/* Premium Header */}
+      <header className="border-b border-border/40 bg-card/95 backdrop-blur-xl supports-[backdrop-filter]:bg-card/60 sticky top-0 z-50 shadow-sm">
+        <div className="container mx-auto px-4 lg:px-8">
+          {/* Top bar with gradient accent */}
+          <div className="h-1 w-full bg-gradient-to-r from-primary via-primary/60 to-accent animate-gradient" />
+          
+          <div className="py-6 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg shadow-primary/25">
+                <Sparkles className="h-6 w-6 text-primary-foreground" />
+              </div>
+              <div>
+                <h1 className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-foreground to-foreground/60 bg-clip-text text-transparent">
+                  JobAutoApply
+                </h1>
+                <p className="text-sm text-muted-foreground flex items-center gap-2">
+                  <Zap className="h-3 w-3" />
+                  AI-Powered Job Application Platform
+                </p>
+              </div>
             </div>
+            
             <div className="flex items-center gap-4">
               {skills.length > 0 && (
-                <div className="text-right">
-                  <p className="text-sm text-muted-foreground">Skills Detected</p>
-                  <p className="text-xl font-semibold">{skills.length}</p>
+                <div className="hidden md:flex items-center gap-3 px-4 py-2 rounded-lg bg-primary/10 border border-primary/20">
+                  <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+                  <div className="text-right">
+                    <p className="text-xs text-muted-foreground">Skills Detected</p>
+                    <p className="text-lg font-bold text-primary">{skills.length}</p>
+                  </div>
                 </div>
               )}
-              <div className="flex items-center gap-3 border-l pl-4">
+              
+              <div className="flex items-center gap-3 pl-4 border-l border-border/40">
                 <div className="text-right hidden sm:block">
-                  <p className="text-sm font-medium">{session.user.name}</p>
+                  <p className="text-sm font-semibold">{session.user.name}</p>
                   <p className="text-xs text-muted-foreground">{session.user.email}</p>
                 </div>
                 <Button 
@@ -223,6 +241,7 @@ export default function Home() {
                   size="icon"
                   onClick={handleSignOut}
                   title="Sign out"
+                  className="h-10 w-10 rounded-lg hover:bg-destructive/10 hover:text-destructive hover:border-destructive/20 transition-all"
                 >
                   <LogOut className="h-4 w-4" />
                 </Button>
@@ -233,28 +252,42 @@ export default function Home() {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 lg:px-8 py-8 lg:py-12">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-8">
-            <TabsTrigger value="upload" className="gap-2">
+          <TabsList className="grid w-full grid-cols-4 mb-8 h-14 bg-card/50 backdrop-blur-sm p-1.5 shadow-sm">
+            <TabsTrigger 
+              value="upload" 
+              className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:shadow-primary/25 transition-all rounded-lg"
+            >
               <Upload className="h-4 w-4" />
-              <span className="hidden sm:inline">Upload Resume</span>
-              <span className="sm:hidden">Upload</span>
+              <span className="hidden sm:inline font-semibold">Upload Resume</span>
+              <span className="sm:hidden font-semibold">Upload</span>
             </TabsTrigger>
-            <TabsTrigger value="search" className="gap-2" disabled={skills.length === 0}>
+            <TabsTrigger 
+              value="search" 
+              className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:shadow-primary/25 transition-all rounded-lg" 
+              disabled={skills.length === 0}
+            >
               <Search className="h-4 w-4" />
-              <span className="hidden sm:inline">Search Jobs</span>
-              <span className="sm:hidden">Search</span>
+              <span className="hidden sm:inline font-semibold">Search Jobs</span>
+              <span className="sm:hidden font-semibold">Search</span>
             </TabsTrigger>
-            <TabsTrigger value="apply" className="gap-2" disabled={foundJobs.length === 0}>
+            <TabsTrigger 
+              value="apply" 
+              className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:shadow-primary/25 transition-all rounded-lg" 
+              disabled={foundJobs.length === 0}
+            >
               <Send className="h-4 w-4" />
-              <span className="hidden sm:inline">Auto Apply</span>
-              <span className="sm:hidden">Apply</span>
+              <span className="hidden sm:inline font-semibold">Auto Apply</span>
+              <span className="sm:hidden font-semibold">Apply</span>
             </TabsTrigger>
-            <TabsTrigger value="dashboard" className="gap-2">
+            <TabsTrigger 
+              value="dashboard" 
+              className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:shadow-primary/25 transition-all rounded-lg"
+            >
               <BarChart3 className="h-4 w-4" />
-              <span className="hidden sm:inline">Dashboard</span>
-              <span className="sm:hidden">Stats</span>
+              <span className="hidden sm:inline font-semibold">Dashboard</span>
+              <span className="sm:hidden font-semibold">Stats</span>
             </TabsTrigger>
           </TabsList>
 
@@ -289,14 +322,20 @@ export default function Home() {
         </Tabs>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t mt-16">
-        <div className="container mx-auto px-4 py-6 text-center text-sm text-muted-foreground">
-          <p>© 2024 JobAutoApply. Streamline your job search with automated applications.</p>
-          <p className="mt-2">
-            <span className="font-semibold">Disclaimer:</span> This is a demonstration app. 
-            Always review and customize your applications before submission.
-          </p>
+      {/* Premium Footer */}
+      <footer className="border-t border-border/40 mt-20 bg-card/50 backdrop-blur-sm">
+        <div className="container mx-auto px-4 lg:px-8 py-8">
+          <div className="text-center space-y-4">
+            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+              <div className="h-1 w-8 bg-gradient-to-r from-transparent via-primary to-transparent" />
+              <p className="font-medium">© 2024 JobAutoApply. Streamline your job search with AI automation.</p>
+              <div className="h-1 w-8 bg-gradient-to-r from-transparent via-primary to-transparent" />
+            </div>
+            <p className="text-xs text-muted-foreground max-w-2xl mx-auto">
+              <span className="font-semibold text-primary">Disclaimer:</span> This is a demonstration platform. 
+              Always review and customize your applications before final submission to ensure accuracy.
+            </p>
+          </div>
         </div>
       </footer>
     </div>

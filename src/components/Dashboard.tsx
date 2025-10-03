@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Briefcase, CheckCircle2, Clock, XCircle, TrendingUp, FileText } from "lucide-react"
+import { Briefcase, CheckCircle2, Clock, XCircle, TrendingUp, FileText, BarChart3 } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -70,97 +70,107 @@ export const Dashboard = ({ applications, stats }: DashboardProps) => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="h-8 w-8 rounded-full border-4 border-primary border-t-transparent animate-spin" />
+        <div className="h-12 w-12 rounded-full border-4 border-primary/30 border-t-primary animate-spin" />
       </div>
     )
   }
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-3xl font-bold mb-2">Application Dashboard</h2>
-        <p className="text-muted-foreground">Track your job applications and success rate</p>
+      <div className="flex items-center gap-3 mb-2">
+        <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg shadow-primary/25">
+          <BarChart3 className="h-6 w-6 text-primary-foreground" />
+        </div>
+        <div>
+          <h2 className="text-3xl font-bold">Application Dashboard</h2>
+          <p className="text-muted-foreground">Track your job applications and success rate</p>
+        </div>
       </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="p-6">
+        <Card className="p-6 shadow-lg border-border/50 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm hover:shadow-xl transition-all duration-300">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-muted-foreground mb-1">Total Applications</p>
-              <p className="text-3xl font-bold">{displayStats.totalApplications}</p>
+              <p className="text-sm text-muted-foreground mb-2 font-medium">Total Applications</p>
+              <p className="text-4xl font-bold">{displayStats.totalApplications}</p>
             </div>
-            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-              <Briefcase className="h-6 w-6 text-primary" />
+            <div className="h-14 w-14 rounded-xl bg-primary/10 flex items-center justify-center shadow-sm">
+              <Briefcase className="h-7 w-7 text-primary" />
             </div>
           </div>
         </Card>
 
-        <Card className="p-6">
+        <Card className="p-6 shadow-lg border-green-200 dark:border-green-800/50 bg-gradient-to-br from-green-50 to-green-50/50 dark:from-green-950/20 dark:to-green-950/10 backdrop-blur-sm hover:shadow-xl transition-all duration-300">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-muted-foreground mb-1">Successful</p>
-              <p className="text-3xl font-bold text-green-600">{displayStats.successfulApplications}</p>
+              <p className="text-sm text-muted-foreground mb-2 font-medium">Successful</p>
+              <p className="text-4xl font-bold text-green-600">{displayStats.successfulApplications}</p>
             </div>
-            <div className="h-12 w-12 rounded-full bg-green-100 dark:bg-green-950/20 flex items-center justify-center">
-              <CheckCircle2 className="h-6 w-6 text-green-600" />
+            <div className="h-14 w-14 rounded-xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center shadow-sm">
+              <CheckCircle2 className="h-7 w-7 text-green-600" />
             </div>
           </div>
         </Card>
 
-        <Card className="p-6">
+        <Card className="p-6 shadow-lg border-amber-200 dark:border-amber-800/50 bg-gradient-to-br from-amber-50 to-amber-50/50 dark:from-amber-950/20 dark:to-amber-950/10 backdrop-blur-sm hover:shadow-xl transition-all duration-300">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-muted-foreground mb-1">Pending</p>
-              <p className="text-3xl font-bold text-amber-600">{displayStats.pendingApplications}</p>
+              <p className="text-sm text-muted-foreground mb-2 font-medium">Pending</p>
+              <p className="text-4xl font-bold text-amber-600">{displayStats.pendingApplications}</p>
             </div>
-            <div className="h-12 w-12 rounded-full bg-amber-100 dark:bg-amber-950/20 flex items-center justify-center">
-              <Clock className="h-6 w-6 text-amber-600" />
+            <div className="h-14 w-14 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center shadow-sm">
+              <Clock className="h-7 w-7 text-amber-600" />
             </div>
           </div>
         </Card>
 
-        <Card className="p-6">
+        <Card className="p-6 shadow-lg border-red-200 dark:border-red-800/50 bg-gradient-to-br from-red-50 to-red-50/50 dark:from-red-950/20 dark:to-red-950/10 backdrop-blur-sm hover:shadow-xl transition-all duration-300">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-muted-foreground mb-1">Failed</p>
-              <p className="text-3xl font-bold text-red-600">{displayStats.failedApplications}</p>
+              <p className="text-sm text-muted-foreground mb-2 font-medium">Failed</p>
+              <p className="text-4xl font-bold text-red-600">{displayStats.failedApplications}</p>
             </div>
-            <div className="h-12 w-12 rounded-full bg-red-100 dark:bg-red-950/20 flex items-center justify-center">
-              <XCircle className="h-6 w-6 text-red-600" />
+            <div className="h-14 w-14 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center shadow-sm">
+              <XCircle className="h-7 w-7 text-red-600" />
             </div>
           </div>
         </Card>
       </div>
 
       {/* Success Rate */}
-      <Card className="p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <TrendingUp className="h-5 w-5 text-primary" />
-            <h3 className="text-lg font-semibold">Success Rate</h3>
+      <Card className="p-6 lg:p-8 shadow-lg border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5 backdrop-blur-sm">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+              <TrendingUp className="h-5 w-5 text-primary" />
+            </div>
+            <h3 className="text-xl font-bold">Success Rate</h3>
           </div>
-          <span className="text-2xl font-bold">{displaySuccessRate.toFixed(1)}%</span>
+          <span className="text-3xl font-bold text-primary">{displaySuccessRate.toFixed(1)}%</span>
         </div>
-        <Progress value={displaySuccessRate} className="h-3" />
-        <p className="text-sm text-muted-foreground mt-2">
+        <Progress value={displaySuccessRate} className="h-4 mb-3" />
+        <p className="text-sm text-muted-foreground">
           {displayStats.successfulApplications} out of {displayStats.totalApplications} applications submitted successfully
         </p>
       </Card>
 
       {/* Application History */}
-      <Card className="p-6">
-        <h3 className="text-lg font-semibold mb-4">Application History</h3>
+      <Card className="p-6 lg:p-8 shadow-lg border-border/50 bg-card/50 backdrop-blur-sm">
+        <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
+          <FileText className="h-5 w-5 text-primary" />
+          Application History
+        </h3>
         
         <Tabs defaultValue="all" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="success">Successful</TabsTrigger>
-            <TabsTrigger value="pending">Pending</TabsTrigger>
-            <TabsTrigger value="failed">Failed</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-4 h-12 bg-muted/50 p-1">
+            <TabsTrigger value="all" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md font-medium">All</TabsTrigger>
+            <TabsTrigger value="success" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md font-medium">Successful</TabsTrigger>
+            <TabsTrigger value="pending" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md font-medium">Pending</TabsTrigger>
+            <TabsTrigger value="failed" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md font-medium">Failed</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="all" className="space-y-4 mt-4">
+          <TabsContent value="all" className="space-y-3 mt-6">
             {applications.length > 0 ? (
               applications.map((app) => (
                 <ApplicationCard key={app.jobId} application={app} />
@@ -170,7 +180,7 @@ export const Dashboard = ({ applications, stats }: DashboardProps) => {
             )}
           </TabsContent>
 
-          <TabsContent value="success" className="space-y-4 mt-4">
+          <TabsContent value="success" className="space-y-3 mt-6">
             {applications.filter(app => app.status === "success").length > 0 ? (
               applications
                 .filter(app => app.status === "success")
@@ -180,7 +190,7 @@ export const Dashboard = ({ applications, stats }: DashboardProps) => {
             )}
           </TabsContent>
 
-          <TabsContent value="pending" className="space-y-4 mt-4">
+          <TabsContent value="pending" className="space-y-3 mt-6">
             {applications.filter(app => app.status === "pending").length > 0 ? (
               applications
                 .filter(app => app.status === "pending")
@@ -190,7 +200,7 @@ export const Dashboard = ({ applications, stats }: DashboardProps) => {
             )}
           </TabsContent>
 
-          <TabsContent value="failed" className="space-y-4 mt-4">
+          <TabsContent value="failed" className="space-y-3 mt-6">
             {applications.filter(app => app.status === "failed").length > 0 ? (
               applications
                 .filter(app => app.status === "failed")
@@ -207,27 +217,27 @@ export const Dashboard = ({ applications, stats }: DashboardProps) => {
 
 function ApplicationCard({ application }: { application: ApplicationHistory }) {
   return (
-    <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors">
+    <div className="flex items-center justify-between p-5 border rounded-xl hover:bg-accent/50 hover:shadow-md transition-all duration-300 bg-card/30">
       <div className="flex items-center gap-4">
-        <div className={`h-10 w-10 rounded-full flex items-center justify-center ${
-          application.status === "success" ? "bg-green-100 dark:bg-green-950/20" :
-          application.status === "failed" ? "bg-red-100 dark:bg-red-950/20" :
-          "bg-amber-100 dark:bg-amber-950/20"
+        <div className={`h-12 w-12 rounded-xl flex items-center justify-center shadow-sm ${
+          application.status === "success" ? "bg-green-100 dark:bg-green-900/30" :
+          application.status === "failed" ? "bg-red-100 dark:bg-red-900/30" :
+          "bg-amber-100 dark:bg-amber-900/30"
         }`}>
-          {application.status === "success" && <CheckCircle2 className="h-5 w-5 text-green-600" />}
-          {application.status === "failed" && <XCircle className="h-5 w-5 text-red-600" />}
-          {application.status === "pending" && <Clock className="h-5 w-5 text-amber-600" />}
+          {application.status === "success" && <CheckCircle2 className="h-6 w-6 text-green-600" />}
+          {application.status === "failed" && <XCircle className="h-6 w-6 text-red-600" />}
+          {application.status === "pending" && <Clock className="h-6 w-6 text-amber-600" />}
         </div>
         
         <div>
-          <h4 className="font-semibold">{application.jobTitle}</h4>
+          <h4 className="font-bold text-base">{application.jobTitle}</h4>
           <p className="text-sm text-muted-foreground">{application.company}</p>
         </div>
       </div>
 
       <div className="flex items-center gap-4">
         <div className="text-right">
-          <Badge variant="outline" className="mb-1">
+          <Badge variant="outline" className="mb-1.5 shadow-sm">
             {application.website}
           </Badge>
           <p className="text-xs text-muted-foreground">{application.appliedAt}</p>
@@ -239,9 +249,9 @@ function ApplicationCard({ application }: { application: ApplicationHistory }) {
             application.status === "failed" ? "destructive" :
             "secondary"
           }
-          className={
-            application.status === "success" ? "bg-green-600" : ""
-          }
+          className={`${
+            application.status === "success" ? "bg-green-600 shadow-sm" : "shadow-sm"
+          } capitalize`}
         >
           {application.status}
         </Badge>
@@ -252,9 +262,11 @@ function ApplicationCard({ application }: { application: ApplicationHistory }) {
 
 function EmptyState({ message = "No applications yet" }: { message?: string }) {
   return (
-    <div className="flex flex-col items-center justify-center py-12 text-center">
-      <FileText className="h-12 w-12 text-muted-foreground mb-4" />
-      <p className="text-muted-foreground">{message}</p>
+    <div className="flex flex-col items-center justify-center py-16 text-center">
+      <div className="h-20 w-20 rounded-2xl bg-muted flex items-center justify-center mb-4">
+        <FileText className="h-10 w-10 text-muted-foreground" />
+      </div>
+      <p className="text-muted-foreground text-lg">{message}</p>
     </div>
   )
 }

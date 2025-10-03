@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Search, Briefcase, MapPin, DollarSign, Clock } from "lucide-react"
+import { Search, Briefcase, MapPin, DollarSign, Clock, Sparkles, TrendingUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
@@ -207,68 +207,85 @@ export const JobSearch = ({ skills, onJobsFound }: JobSearchProps) => {
 
   return (
     <div className="space-y-6">
-      <Card className="p-6">
-        <h2 className="text-2xl font-bold mb-6">Search for Jobs</h2>
-        
-        <div className="space-y-4">
+      <Card className="p-6 lg:p-8 shadow-lg border-border/50 bg-card/50 backdrop-blur-sm">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg shadow-primary/25">
+            <Search className="h-6 w-6 text-primary-foreground" />
+          </div>
           <div>
-            <Label htmlFor="search-query">Job Title or Keywords</Label>
+            <h2 className="text-2xl font-bold">Search for Jobs</h2>
+            <p className="text-sm text-muted-foreground">Find opportunities matching your skills</p>
+          </div>
+        </div>
+        
+        <div className="space-y-5">
+          <div>
+            <Label htmlFor="search-query" className="text-sm font-semibold mb-2 flex items-center gap-2">
+              <TrendingUp className="h-4 w-4 text-primary" />
+              Job Title or Keywords
+            </Label>
             <div className="flex gap-2 mt-2">
               <Input
                 id="search-query"
                 placeholder="e.g., Full Stack Developer, Python Engineer"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="flex-1"
+                className="flex-1 h-12 bg-background/50"
               />
             </div>
           </div>
 
           <div>
-            <Label htmlFor="location">Location (Optional)</Label>
+            <Label htmlFor="location" className="text-sm font-semibold mb-2 flex items-center gap-2">
+              <MapPin className="h-4 w-4 text-primary" />
+              Location (Optional)
+            </Label>
             <Input
               id="location"
               placeholder="e.g., Bangalore, Remote"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              className="mt-2"
+              className="mt-2 h-12 bg-background/50"
             />
           </div>
 
           <div>
-            <Label htmlFor="job-description">Or Paste Job Description</Label>
+            <Label htmlFor="job-description" className="text-sm font-semibold mb-2 flex items-center gap-2">
+              <Briefcase className="h-4 w-4 text-primary" />
+              Or Paste Job Description
+            </Label>
             <Textarea
               id="job-description"
               placeholder="Paste a job description to find similar opportunities..."
               value={jobDescription}
               onChange={(e) => setJobDescription(e.target.value)}
-              className="mt-2 min-h-[120px]"
+              className="mt-2 min-h-[120px] bg-background/50"
             />
           </div>
 
           <Button 
             onClick={handleSearch} 
             disabled={isSearching || skills.length === 0}
-            className="w-full"
+            className="w-full h-12 shadow-lg shadow-primary/25 gap-2"
             size="lg"
           >
             {isSearching ? (
               <>
                 <div className="h-4 w-4 mr-2 rounded-full border-2 border-white border-t-transparent animate-spin" />
-                Searching...
+                Searching Jobs...
               </>
             ) : (
               <>
-                <Search className="h-4 w-4 mr-2" />
+                <Sparkles className="h-4 w-4" />
                 Search Jobs
               </>
             )}
           </Button>
 
           {skills.length === 0 && (
-            <p className="text-sm text-muted-foreground text-center">
+            <div className="text-sm text-amber-600 dark:text-amber-400 text-center p-4 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800">
               Please upload a resume first to enable job search
-            </p>
+            </div>
           )}
         </div>
       </Card>
@@ -276,44 +293,57 @@ export const JobSearch = ({ skills, onJobsFound }: JobSearchProps) => {
       {foundJobs.length > 0 && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-xl font-semibold">Found {foundJobs.length} Jobs</h3>
+            <h3 className="text-2xl font-bold flex items-center gap-2">
+              <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Briefcase className="h-4 w-4 text-primary" />
+              </div>
+              Found {foundJobs.length} Jobs
+            </h3>
           </div>
 
           {foundJobs.map((job) => (
-            <Card key={job.id} className="p-6 hover:shadow-lg transition-shadow">
+            <Card key={job.id} className="p-6 hover:shadow-xl hover:scale-[1.01] transition-all duration-300 border-border/50 bg-card/50 backdrop-blur-sm group">
               <div className="space-y-4">
                 <div className="flex items-start justify-between">
                   <div>
-                    <h4 className="text-lg font-semibold mb-1">{job.title}</h4>
-                    <p className="text-muted-foreground">{job.company}</p>
+                    <h4 className="text-xl font-bold mb-1 group-hover:text-primary transition-colors">{job.title}</h4>
+                    <p className="text-muted-foreground font-medium">{job.company}</p>
                   </div>
-                  <Badge variant="secondary">{job.website}</Badge>
+                  <Badge variant="secondary" className="shadow-sm">{job.website}</Badge>
                 </div>
 
                 <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-1">
-                    <MapPin className="h-4 w-4" />
+                  <div className="flex items-center gap-1.5">
+                    <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center">
+                      <MapPin className="h-4 w-4" />
+                    </div>
                     {job.location}
                   </div>
-                  <div className="flex items-center gap-1">
-                    <DollarSign className="h-4 w-4" />
+                  <div className="flex items-center gap-1.5">
+                    <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center">
+                      <DollarSign className="h-4 w-4" />
+                    </div>
                     {job.salary}
                   </div>
-                  <div className="flex items-center gap-1">
-                    <Briefcase className="h-4 w-4" />
+                  <div className="flex items-center gap-1.5">
+                    <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center">
+                      <Briefcase className="h-4 w-4" />
+                    </div>
                     {job.type}
                   </div>
-                  <div className="flex items-center gap-1">
-                    <Clock className="h-4 w-4" />
+                  <div className="flex items-center gap-1.5">
+                    <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center">
+                      <Clock className="h-4 w-4" />
+                    </div>
                     {job.posted}
                   </div>
                 </div>
 
-                <p className="text-sm">{job.description}</p>
+                <p className="text-sm leading-relaxed">{job.description}</p>
 
                 <div className="flex flex-wrap gap-2">
                   {job.skills.map((skill, index) => (
-                    <Badge key={index} variant="outline" className="text-xs">
+                    <Badge key={index} variant="outline" className="text-xs px-3 py-1 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors">
                       {skill}
                     </Badge>
                   ))}

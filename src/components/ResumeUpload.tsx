@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useCallback } from "react"
-import { Upload, FileText, X, CheckCircle2 } from "lucide-react"
+import { Upload, FileText, X, CheckCircle2, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -142,28 +142,38 @@ export const ResumeUpload = ({ onSkillsExtracted, onResumeUploaded }: ResumeUplo
 
   return (
     <div className="space-y-6">
-      <Card className="p-8">
+      <Card className="p-8 lg:p-10 shadow-lg border-border/50 bg-card/50 backdrop-blur-sm">
         <div
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
-          className={`border-2 border-dashed rounded-lg p-12 text-center transition-colors ${
-            isDragging ? "border-primary bg-primary/5" : "border-muted-foreground/25"
+          className={`border-2 border-dashed rounded-2xl p-12 lg:p-16 text-center transition-all duration-300 ${
+            isDragging 
+              ? "border-primary bg-primary/10 scale-[1.02] shadow-lg shadow-primary/20" 
+              : "border-border hover:border-primary/50 hover:bg-accent/5"
           }`}
         >
           {!uploadedFile ? (
-            <div className="space-y-4">
+            <div className="space-y-6">
               <div className="flex justify-center">
-                <Upload className="h-12 w-12 text-muted-foreground" />
+                <div className="relative">
+                  <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full" />
+                  <div className="relative h-20 w-20 rounded-2xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-xl shadow-primary/25">
+                    <Upload className="h-10 w-10 text-primary-foreground" />
+                  </div>
+                </div>
               </div>
-              <div>
-                <h3 className="text-lg font-semibold mb-2">Upload Your Resume</h3>
-                <p className="text-sm text-muted-foreground mb-4">
+              <div className="space-y-3">
+                <h3 className="text-2xl font-bold">Upload Your Resume</h3>
+                <p className="text-muted-foreground max-w-md mx-auto">
                   Drag and drop your resume or click to browse
                 </p>
-                <p className="text-xs text-muted-foreground mb-4">
-                  Supports PDF, DOC, DOCX, and TXT files
-                </p>
+                <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground">
+                  <Badge variant="outline" className="font-normal">PDF</Badge>
+                  <Badge variant="outline" className="font-normal">DOC</Badge>
+                  <Badge variant="outline" className="font-normal">DOCX</Badge>
+                  <Badge variant="outline" className="font-normal">TXT</Badge>
+                </div>
                 <input
                   type="file"
                   id="resume-upload"
@@ -171,35 +181,48 @@ export const ResumeUpload = ({ onSkillsExtracted, onResumeUploaded }: ResumeUplo
                   accept=".pdf,.doc,.docx,.txt"
                   onChange={handleFileSelect}
                 />
-                <Button asChild>
-                  <label htmlFor="resume-upload" className="cursor-pointer">
-                    Choose File
-                  </label>
-                </Button>
+                <div className="pt-4">
+                  <Button asChild size="lg" className="shadow-lg shadow-primary/25 gap-2">
+                    <label htmlFor="resume-upload" className="cursor-pointer">
+                      <Sparkles className="h-4 w-4" />
+                      Choose File
+                    </label>
+                  </Button>
+                </div>
               </div>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-6">
               <div className="flex items-center justify-center gap-3">
                 {isProcessing ? (
-                  <div className="h-12 w-12 rounded-full border-4 border-primary border-t-transparent animate-spin" />
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full" />
+                    <div className="relative h-16 w-16 rounded-full border-4 border-primary/30 border-t-primary animate-spin" />
+                  </div>
                 ) : (
-                  <CheckCircle2 className="h-12 w-12 text-green-500" />
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-green-500/20 blur-2xl rounded-full" />
+                    <div className="relative h-16 w-16 rounded-2xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-xl shadow-green-500/25">
+                      <CheckCircle2 className="h-8 w-8 text-white" />
+                    </div>
+                  </div>
                 )}
               </div>
-              <div>
-                <div className="flex items-center justify-center gap-2 mb-2">
+              <div className="space-y-3">
+                <div className="flex items-center justify-center gap-2">
                   <FileText className="h-5 w-5 text-primary" />
-                  <span className="font-medium">{uploadedFile.name}</span>
+                  <span className="font-semibold text-lg">{uploadedFile.name}</span>
                 </div>
-                <p className="text-sm text-muted-foreground mb-4">
-                  {isProcessing ? "Processing and saving resume..." : "Resume uploaded successfully"}
+                <p className="text-muted-foreground">
+                  {isProcessing ? "Processing and extracting skills..." : "Resume uploaded successfully!"}
                 </p>
                 {!isProcessing && (
-                  <Button variant="outline" onClick={handleRemoveFile}>
-                    <X className="h-4 w-4 mr-2" />
-                    Remove
-                  </Button>
+                  <div className="pt-2">
+                    <Button variant="outline" onClick={handleRemoveFile} className="gap-2">
+                      <X className="h-4 w-4" />
+                      Remove File
+                    </Button>
+                  </div>
                 )}
               </div>
             </div>
@@ -208,17 +231,29 @@ export const ResumeUpload = ({ onSkillsExtracted, onResumeUploaded }: ResumeUplo
       </Card>
 
       {extractedSkills.length > 0 && (
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Extracted Skills</h3>
-          <div className="flex flex-wrap gap-2">
+        <Card className="p-6 lg:p-8 shadow-lg border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5 backdrop-blur-sm">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Sparkles className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold">Extracted Skills</h3>
+              <p className="text-sm text-muted-foreground">Found {extractedSkills.length} relevant skills</p>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2 mb-4">
             {extractedSkills.map((skill, index) => (
-              <Badge key={index} variant="secondary" className="text-sm">
+              <Badge 
+                key={index} 
+                variant="secondary" 
+                className="text-sm px-3 py-1.5 bg-card hover:bg-primary hover:text-primary-foreground transition-colors shadow-sm"
+              >
                 {skill}
               </Badge>
             ))}
           </div>
-          <p className="text-sm text-muted-foreground mt-4">
-            These skills will be used to find relevant job opportunities
+          <p className="text-sm text-muted-foreground">
+            These skills will be used to find relevant job opportunities matching your profile
           </p>
         </Card>
       )}

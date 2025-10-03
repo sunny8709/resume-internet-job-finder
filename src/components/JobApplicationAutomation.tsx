@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Send, CheckCircle2, AlertCircle, Loader2, ExternalLink } from "lucide-react"
+import { Send, CheckCircle2, AlertCircle, Loader2, ExternalLink, Sparkles, Mail, Phone, Linkedin } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -189,66 +189,87 @@ export const JobApplicationAutomation = ({
 
   return (
     <div className="space-y-6">
-      <Card className="p-6">
-        <h2 className="text-2xl font-bold mb-6">Automated Job Application</h2>
-        
-        <div className="space-y-4 mb-6">
+      <Card className="p-6 lg:p-8 shadow-lg border-border/50 bg-card/50 backdrop-blur-sm">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg shadow-primary/25">
+            <Send className="h-6 w-6 text-primary-foreground" />
+          </div>
           <div>
-            <Label htmlFor="email">Email Address *</Label>
+            <h2 className="text-2xl font-bold">Automated Job Application</h2>
+            <p className="text-sm text-muted-foreground">Configure your profile and apply to multiple jobs</p>
+          </div>
+        </div>
+        
+        <div className="space-y-5 mb-6">
+          <div>
+            <Label htmlFor="email" className="text-sm font-semibold mb-2 flex items-center gap-2">
+              <Mail className="h-4 w-4 text-primary" />
+              Email Address *
+            </Label>
             <Input
               id="email"
               type="email"
               placeholder="your.email@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="mt-2"
+              className="mt-2 h-12 bg-background/50"
             />
           </div>
 
           <div>
-            <Label htmlFor="phone">Phone Number *</Label>
+            <Label htmlFor="phone" className="text-sm font-semibold mb-2 flex items-center gap-2">
+              <Phone className="h-4 w-4 text-primary" />
+              Phone Number *
+            </Label>
             <Input
               id="phone"
               type="tel"
               placeholder="+91 1234567890"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              className="mt-2"
+              className="mt-2 h-12 bg-background/50"
             />
           </div>
 
           <div>
-            <Label htmlFor="linkedin">LinkedIn Profile (Optional)</Label>
+            <Label htmlFor="linkedin" className="text-sm font-semibold mb-2 flex items-center gap-2">
+              <Linkedin className="h-4 w-4 text-primary" />
+              LinkedIn Profile (Optional)
+            </Label>
             <Input
               id="linkedin"
               type="url"
               placeholder="https://linkedin.com/in/yourprofile"
               value={linkedIn}
               onChange={(e) => setLinkedIn(e.target.value)}
-              className="mt-2"
+              className="mt-2 h-12 bg-background/50"
             />
           </div>
 
           <div>
-            <Label htmlFor="cover-letter">Cover Letter Template (Optional)</Label>
+            <Label htmlFor="cover-letter" className="text-sm font-semibold mb-2 flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-primary" />
+              Cover Letter Template (Optional)
+            </Label>
             <Textarea
               id="cover-letter"
               placeholder="Write a general cover letter that will be customized for each application..."
               value={coverLetter}
               onChange={(e) => setCoverLetter(e.target.value)}
-              className="mt-2 min-h-[120px]"
+              className="mt-2 min-h-[120px] bg-background/50"
             />
           </div>
         </div>
 
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
+        <div className="flex items-center justify-between mb-4 p-4 rounded-xl bg-gradient-to-r from-primary/5 to-accent/5 border border-border/50">
+          <div className="flex items-center gap-3">
             <Checkbox
               id="select-all"
               checked={selectedJobs.length === jobs.length && jobs.length > 0}
               onCheckedChange={selectAllJobs}
+              className="h-5 w-5"
             />
-            <Label htmlFor="select-all" className="cursor-pointer">
+            <Label htmlFor="select-all" className="cursor-pointer font-semibold">
               Select All ({selectedJobs.length}/{jobs.length})
             </Label>
           </div>
@@ -257,6 +278,7 @@ export const JobApplicationAutomation = ({
             onClick={handleApplyToAll}
             disabled={isApplying || selectedJobs.length === 0 || !email || !phone}
             size="lg"
+            className="shadow-lg shadow-primary/25 gap-2"
           >
             {isApplying ? (
               <>
@@ -265,7 +287,7 @@ export const JobApplicationAutomation = ({
               </>
             ) : (
               <>
-                <Send className="h-4 w-4 mr-2" />
+                <Send className="h-4 w-4" />
                 Apply to {selectedJobs.length} Job{selectedJobs.length !== 1 ? "s" : ""}
               </>
             )}
@@ -273,19 +295,23 @@ export const JobApplicationAutomation = ({
         </div>
 
         {isApplying && (
-          <div className="mb-6">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium">Application Progress</span>
-              <span className="text-sm text-muted-foreground">{Math.round(progress)}%</span>
+          <div className="mb-6 p-4 rounded-xl bg-primary/5 border border-primary/20">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm font-semibold flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                Application Progress
+              </span>
+              <span className="text-sm font-bold text-primary">{Math.round(progress)}%</span>
             </div>
-            <Progress value={progress} className="h-2" />
+            <Progress value={progress} className="h-2.5" />
           </div>
         )}
 
         {!email || !phone && (
-          <p className="text-sm text-amber-600 mb-4">
+          <div className="text-sm text-amber-600 dark:text-amber-400 p-4 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800">
+            <AlertCircle className="h-4 w-4 inline mr-2" />
             Please fill in your email and phone number to enable job applications
-          </p>
+          </div>
         )}
       </Card>
 
@@ -297,11 +323,11 @@ export const JobApplicationAutomation = ({
           return (
             <Card 
               key={job.id} 
-              className={`p-6 transition-all ${
-                isSelected ? "ring-2 ring-primary" : ""
+              className={`p-6 transition-all duration-300 border-border/50 bg-card/50 backdrop-blur-sm ${
+                isSelected ? "ring-2 ring-primary shadow-lg shadow-primary/20 scale-[1.01]" : "hover:shadow-lg"
               } ${
-                status === "success" ? "bg-green-50 dark:bg-green-950/20" :
-                status === "failed" ? "bg-red-50 dark:bg-red-950/20" : ""
+                status === "success" ? "bg-gradient-to-br from-green-50 to-green-50/50 dark:from-green-950/20 dark:to-green-950/10 border-green-200 dark:border-green-800" :
+                status === "failed" ? "bg-gradient-to-br from-red-50 to-red-50/50 dark:from-red-950/20 dark:to-red-950/10 border-red-200 dark:border-red-800" : ""
               }`}
             >
               <div className="flex items-start gap-4">
@@ -310,78 +336,81 @@ export const JobApplicationAutomation = ({
                   checked={isSelected}
                   onCheckedChange={() => toggleJobSelection(job.id)}
                   disabled={isApplying || status === "success"}
-                  className="mt-1"
+                  className="mt-1 h-5 w-5"
                 />
 
-                <div className="flex-1 space-y-3">
+                <div className="flex-1 space-y-4">
                   <div className="flex items-start justify-between">
                     <div>
-                      <Label htmlFor={`job-${job.id}`} className="text-lg font-semibold cursor-pointer">
+                      <Label htmlFor={`job-${job.id}`} className="text-xl font-bold cursor-pointer hover:text-primary transition-colors">
                         {job.title}
                       </Label>
-                      <p className="text-muted-foreground">{job.company}</p>
+                      <p className="text-muted-foreground font-medium">{job.company}</p>
                     </div>
                     
                     <div className="flex items-center gap-2">
                       {status === "applying" && (
-                        <Badge variant="secondary" className="gap-1">
+                        <Badge variant="secondary" className="gap-1.5 shadow-sm">
                           <Loader2 className="h-3 w-3 animate-spin" />
                           Applying
                         </Badge>
                       )}
                       {status === "success" && (
-                        <Badge variant="default" className="gap-1 bg-green-600">
+                        <Badge variant="default" className="gap-1.5 bg-green-600 shadow-sm">
                           <CheckCircle2 className="h-3 w-3" />
                           Applied
                         </Badge>
                       )}
                       {status === "failed" && (
-                        <Badge variant="destructive" className="gap-1">
+                        <Badge variant="destructive" className="gap-1.5 shadow-sm">
                           <AlertCircle className="h-3 w-3" />
                           Failed
                         </Badge>
                       )}
-                      <Badge variant="outline">{job.website}</Badge>
+                      <Badge variant="outline" className="shadow-sm">{job.website}</Badge>
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
-                    <span>{job.location}</span>
+                  <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
+                    <span className="flex items-center gap-1">
+                      <div className="h-1.5 w-1.5 rounded-full bg-primary" />
+                      {job.location}
+                    </span>
                     <span>•</span>
                     <span>{job.salary}</span>
                     <span>•</span>
                     <span>{job.type}</span>
                   </div>
 
-                  <p className="text-sm">{job.description}</p>
+                  <p className="text-sm leading-relaxed">{job.description}</p>
 
                   <div className="flex flex-wrap gap-2">
                     {job.skills.map((skill, index) => (
-                      <Badge key={index} variant="secondary" className="text-xs">
+                      <Badge key={index} variant="secondary" className="text-xs px-3 py-1 shadow-sm">
                         {skill}
                       </Badge>
                     ))}
                   </div>
 
                   {status === "success" && (
-                    <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
+                    <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400 p-3 rounded-lg bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800">
                       <CheckCircle2 className="h-4 w-4" />
                       Application submitted successfully! Check your email for confirmation.
                     </div>
                   )}
 
                   {status === "failed" && (
-                    <div className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400">
+                    <div className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400 p-3 rounded-lg bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800">
                       <AlertCircle className="h-4 w-4" />
                       Application failed. Please try again or apply manually on {job.website}
                     </div>
                   )}
 
                   <div className="pt-2">
-                    <Button variant="outline" size="sm" asChild>
+                    <Button variant="outline" size="sm" asChild className="gap-2 shadow-sm">
                       <a href={`https://${job.website}`} target="_blank" rel="noopener noreferrer">
                         View on {job.website}
-                        <ExternalLink className="h-3 w-3 ml-2" />
+                        <ExternalLink className="h-3 w-3" />
                       </a>
                     </Button>
                   </div>
@@ -393,10 +422,15 @@ export const JobApplicationAutomation = ({
       </div>
 
       {jobs.length === 0 && (
-        <Card className="p-12 text-center">
-          <p className="text-muted-foreground">
-            No jobs available. Please search for jobs first.
-          </p>
+        <Card className="p-12 text-center shadow-lg border-border/50 bg-card/50 backdrop-blur-sm">
+          <div className="flex flex-col items-center gap-4">
+            <div className="h-16 w-16 rounded-2xl bg-muted flex items-center justify-center">
+              <Send className="h-8 w-8 text-muted-foreground" />
+            </div>
+            <p className="text-muted-foreground text-lg">
+              No jobs available. Please search for jobs first.
+            </p>
+          </div>
         </Card>
       )}
     </div>
