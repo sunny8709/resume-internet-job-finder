@@ -65,10 +65,14 @@ export const ResumeUpload = ({ onSkillsExtracted, onResumeUploaded }: ResumeUplo
         const skills = extractSkillsFromText(text)
         setExtractedSkills(skills)
         
-        // Save to database
+        // Save to database with authentication
+        const token = localStorage.getItem("bearer_token")
         const response = await fetch('/api/resumes', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
           body: JSON.stringify({
             fileName: file.name,
             resumeText: text,
