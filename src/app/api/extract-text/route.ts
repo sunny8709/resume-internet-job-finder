@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { PDFExtract } from "pdf.js-extract"
+import { extractText } from "unpdf"
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,14 +17,9 @@ export async function POST(request: NextRequest) {
     const fileType = file.type.toLowerCase()
 
     if (fileType === "application/pdf") {
-      // Extract text from PDF using pdf.js-extract
-      const pdfExtract = new PDFExtract()
-      const data = await pdfExtract.extractBuffer(buffer)
-      
-      // Combine text from all pages
-      text = data.pages
-        .map(page => page.content.map(item => item.str).join(" "))
-        .join("\n")
+      // Extract text from PDF using unpdf
+      const pdfData = await extractText(buffer)
+      text = pdfData.text || ""
     } else if (fileType === "text/plain") {
       // Plain text file
       text = buffer.toString("utf-8")
