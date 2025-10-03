@@ -27,6 +27,7 @@ export async function GET(request: NextRequest) {
   try {
     const profile = await db.select()
       .from(userProfile)
+      .where(eq(userProfile.userId, user.id))
       .limit(1);
 
     if (profile.length === 0) {
@@ -60,9 +61,10 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    // Check if profile already exists
+    // Check if profile already exists for this user
     const existingProfile = await db.select()
       .from(userProfile)
+      .where(eq(userProfile.userId, user.id))
       .limit(1);
 
     const now = new Date().toISOString();
@@ -77,14 +79,15 @@ export async function POST(request: NextRequest) {
           coverLetter: coverLetter || existingProfile[0].coverLetter,
           updatedAt: now
         })
-        .where(eq(userProfile.id, existingProfile[0].id))
+        .where(eq(userProfile.userId, user.id))
         .returning();
 
       return NextResponse.json(updated[0]);
     } else {
-      // Create new profile
+      // Create new profile with userId
       const newProfile = await db.insert(userProfile)
         .values({
+          userId: user.id,
           email: email || null,
           phone: phone || null,
           linkedin: linkedin || null,
@@ -122,9 +125,10 @@ export async function PUT(request: NextRequest) {
       }, { status: 400 });
     }
 
-    // Check if profile already exists
+    // Check if profile already exists for this user
     const existingProfile = await db.select()
       .from(userProfile)
+      .where(eq(userProfile.userId, user.id))
       .limit(1);
 
     const now = new Date().toISOString();
@@ -140,14 +144,15 @@ export async function PUT(request: NextRequest) {
 
       const updated = await db.update(userProfile)
         .set(updateData)
-        .where(eq(userProfile.id, existingProfile[0].id))
+        .where(eq(userProfile.userId, user.id))
         .returning();
 
       return NextResponse.json(updated[0]);
     } else {
-      // Create new profile
+      // Create new profile with userId
       const newProfile = await db.insert(userProfile)
         .values({
+          userId: user.id,
           email: email || null,
           phone: phone || null,
           linkedin: linkedin || null,

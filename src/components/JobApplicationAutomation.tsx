@@ -51,7 +51,12 @@ export const JobApplicationAutomation = ({
   useEffect(() => {
     const loadProfile = async () => {
       try {
-        const response = await fetch('/api/profile')
+        const token = localStorage.getItem("bearer_token")
+        const response = await fetch('/api/profile', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
         if (response.ok) {
           const profile = await response.json()
           setEmail(profile.email || "")
@@ -73,10 +78,14 @@ export const JobApplicationAutomation = ({
     const saveProfile = async () => {
       if (!isLoadingProfile && (email || phone || linkedIn || coverLetter)) {
         try {
+          const token = localStorage.getItem("bearer_token")
           await fetch('/api/profile', {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, phone, linkedin: In, coverLetter })
+            headers: { 
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({ email, phone, linkedin: linkedIn, coverLetter })
           })
         } catch (error) {
           console.error('Error saving profile:', error)
@@ -140,9 +149,13 @@ export const JobApplicationAutomation = ({
       try {
         const job = jobs.find(j => j.id === jobId)
         if (job) {
+          const token = localStorage.getItem("bearer_token")
           const response = await fetch('/api/applications', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`
+            },
             body: JSON.stringify({
               jobId: parseInt(jobId),
               jobTitle: job.title,

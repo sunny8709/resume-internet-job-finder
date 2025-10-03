@@ -150,9 +150,13 @@ export const JobSearch = ({ skills, onJobsFound }: JobSearchProps) => {
           posted: job.posted
         }))
 
+        const token = localStorage.getItem("bearer_token")
         const response = await fetch('/api/jobs', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
           body: JSON.stringify(jobsToSave)
         })
 

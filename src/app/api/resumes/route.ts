@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
 import { resumes } from '@/db/schema';
-import { eq, like, desc } from 'drizzle-orm';
+import { eq, like, desc, and } from 'drizzle-orm';
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 
@@ -34,7 +34,10 @@ export async function GET(request: NextRequest) {
 
       const resume = await db.select()
         .from(resumes)
-        .where(eq(resumes.id, parseInt(id)))
+        .where(and(
+          eq(resumes.id, parseInt(id)),
+          eq(resumes.userId, user.id)
+        ))
         .limit(1);
 
       if (resume.length === 0) {
@@ -44,15 +47,18 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(resume[0]);
     }
 
-    // List resumes with pagination and search
+    // List resumes with pagination and search - filtered by userId
     const limit = Math.min(parseInt(searchParams.get('limit') || '10'), 100);
     const offset = parseInt(searchParams.get('offset') || '0');
     const search = searchParams.get('search');
 
-    let query = db.select().from(resumes);
+    let query = db.select().from(resumes).where(eq(resumes.userId, user.id));
 
     if (search) {
-      query = query.where(like(resumes.fileName, `%${search}%`));
+      query = query.where(and(
+        eq(resumes.userId, user.id),
+        like(resumes.fileName, `%${search}%`)
+      ));
     }
 
     const results = await query
@@ -88,8 +94,9 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    // Sanitize inputs
+    // Sanitize inputs and automatically set userId
     const sanitizedData = {
+      userId: user.id,
       resumeText: resumeText ? resumeText.toString().trim() : null,
       skills: skills || [],
       fileName: fileName.toString().trim(),
@@ -132,10 +139,13 @@ export async function PUT(request: NextRequest) {
     const requestBody = await request.json();
     const { resumeText, skills, fileName, fileSize, fileType } = requestBody;
 
-    // Check if record exists
+    // Check if record exists and belongs to user
     const existingResume = await db.select()
       .from(resumes)
-      .where(eq(resumes.id, parseInt(id)))
+      .where(and(
+        eq(resumes.id, parseInt(id)),
+        eq(resumes.userId, user.id)
+      ))
       .limit(1);
 
     if (existingResume.length === 0) {
@@ -169,7 +179,10 @@ export async function PUT(request: NextRequest) {
 
     const updated = await db.update(resumes)
       .set(updateData)
-      .where(eq(resumes.id, parseInt(id)))
+      .where(and(
+        eq(resumes.id, parseInt(id)),
+        eq(resumes.userId, user.id)
+      ))
       .returning();
 
     return NextResponse.json(updated[0]);
@@ -199,10 +212,13 @@ export async function DELETE(request: NextRequest) {
       }, { status: 400 });
     }
 
-    // Check if record exists before deleting
+    // Check if record exists and belongs to user
     const existingResume = await db.select()
       .from(resumes)
-      .where(eq(resumes.id, parseInt(id)))
+      .where(and(
+        eq(resumes.id, parseInt(id)),
+        eq(resumes.userId, user.id)
+      ))
       .limit(1);
 
     if (existingResume.length === 0) {
@@ -210,7 +226,10 @@ export async function DELETE(request: NextRequest) {
     }
 
     const deleted = await db.delete(resumes)
-      .where(eq(resumes.id, parseInt(id)))
+      .where(and(
+        eq(resumes.id, parseInt(id)),
+        eq(resumes.userId, user.id)
+      ))
       .returning();
 
     return NextResponse.json({

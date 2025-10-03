@@ -34,7 +34,10 @@ export async function GET(request: NextRequest) {
 
       const job = await db.select()
         .from(jobs)
-        .where(eq(jobs.id, parseInt(id)))
+        .where(and(
+          eq(jobs.id, parseInt(id)),
+          eq(jobs.userId, user.id)
+        ))
         .limit(1);
 
       if (job.length === 0) {
@@ -44,15 +47,15 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(job[0]);
     }
 
-    // List jobs with pagination, search, and filtering
+    // List jobs with pagination, search, and filtering - filtered by userId
     const limit = Math.min(parseInt(searchParams.get('limit') || '10'), 100);
     const offset = parseInt(searchParams.get('offset') || '0');
     const search = searchParams.get('search');
     const location = searchParams.get('location');
     const type = searchParams.get('type');
 
-    let query = db.select().from(jobs);
-    const conditions = [];
+    let query = db.select().from(jobs).where(eq(jobs.userId, user.id));
+    const conditions = [eq(jobs.userId, user.id)];
 
     // Search by title or company
     if (search) {
@@ -74,7 +77,7 @@ export async function GET(request: NextRequest) {
       conditions.push(eq(jobs.type, type));
     }
 
-    if (conditions.length > 0) {
+    if (conditions.length > 1) {
       query = query.where(and(...conditions));
     }
 
@@ -131,8 +134,9 @@ export async function POST(request: NextRequest) {
         }, { status: 400 });
       }
 
-      // Prepare validated job data
+      // Prepare validated job data with userId
       const validatedJob = {
+        userId: user.id,
         title: job.title.trim(),
         company: job.company.trim(),
         location: job.location ? job.location.trim() : null,
@@ -181,10 +185,13 @@ export async function PUT(request: NextRequest) {
 
     const requestBody = await request.json();
     
-    // Check if record exists
+    // Check if record exists and belongs to user
     const existingJob = await db.select()
       .from(jobs)
-      .where(eq(jobs.id, parseInt(id)))
+      .where(and(
+        eq(jobs.id, parseInt(id)),
+        eq(jobs.userId, user.id)
+      ))
       .limit(1);
 
     if (existingJob.length === 0) {
@@ -242,12 +249,12 @@ export async function PUT(request: NextRequest) {
       updates.posted = requestBody.posted ? requestBody.posted.trim() : null;
     }
 
-    // Always update timestamp
-    updates.updatedAt = new Date().toISOString();
-
     const updatedJob = await db.update(jobs)
       .set(updates)
-      .where(eq(jobs.id, parseInt(id)))
+      .where(and(
+        eq(jobs.id, parseInt(id)),
+        eq(jobs.userId, user.id)
+      ))
       .returning();
 
     if (updatedJob.length === 0) {
@@ -280,10 +287,13 @@ export async function DELETE(request: NextRequest) {
       }, { status: 400 });
     }
 
-    // Check if record exists
+    // Check if record exists and belongs to user
     const existingJob = await db.select()
       .from(jobs)
-      .where(eq(jobs.id, parseInt(id)))
+      .where(and(
+        eq(jobs.id, parseInt(id)),
+        eq(jobs.userId, user.id)
+      ))
       .limit(1);
 
     if (existingJob.length === 0) {
@@ -291,7 +301,10 @@ export async function DELETE(request: NextRequest) {
     }
 
     const deletedJob = await db.delete(jobs)
-      .where(eq(jobs.id, parseInt(id)))
+      .where(and(
+        eq(jobs.id, parseInt(id)),
+        eq(jobs.userId, user.id)
+      ))
       .returning();
 
     if (deletedJob.length === 0) {

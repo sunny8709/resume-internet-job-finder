@@ -41,7 +41,10 @@ export async function GET(request: NextRequest) {
 
       const application = await db.select()
         .from(applications)
-        .where(eq(applications.id, parseInt(id)))
+        .where(and(
+          eq(applications.id, parseInt(id)),
+          eq(applications.userId, user.id)
+        ))
         .limit(1);
 
       if (application.length === 0) {
@@ -51,7 +54,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(application[0]);
     }
 
-    // List applications with pagination, search, and filtering
+    // List applications with pagination, search, and filtering - filtered by userId
     const limit = Math.min(parseInt(searchParams.get('limit') || '10'), 100);
     const offset = parseInt(searchParams.get('offset') || '0');
     const search = searchParams.get('search');
@@ -59,9 +62,9 @@ export async function GET(request: NextRequest) {
     const sort = searchParams.get('sort') || 'createdAt';
     const order = searchParams.get('order') || 'desc';
 
-    let query = db.select().from(applications);
+    let query = db.select().from(applications).where(eq(applications.userId, user.id));
     
-    const conditions = [];
+    const conditions = [eq(applications.userId, user.id)];
 
     // Search by jobTitle or company
     if (search) {
@@ -78,7 +81,7 @@ export async function GET(request: NextRequest) {
       conditions.push(eq(applications.status, status));
     }
 
-    if (conditions.length > 0) {
+    if (conditions.length > 1) {
       query = query.where(and(...conditions));
     }
 
@@ -140,21 +143,25 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    // Validate foreign key relationship - check if job exists
+    // Validate foreign key relationship - check if job exists and belongs to user
     const existingJob = await db.select()
       .from(jobs)
-      .where(eq(jobs.id, parseInt(jobId.toString())))
+      .where(and(
+        eq(jobs.id, parseInt(jobId.toString())),
+        eq(jobs.userId, user.id)
+      ))
       .limit(1);
 
     if (existingJob.length === 0) {
       return NextResponse.json({ 
-        error: "Referenced job does not exist",
+        error: "Referenced job does not exist or does not belong to user",
         code: "INVALID_FOREIGN_KEY" 
       }, { status: 400 });
     }
 
-    // Prepare insert data with auto-generated fields
+    // Prepare insert data with auto-generated fields and userId
     const insertData = {
+      userId: user.id,
       jobId: parseInt(jobId.toString()),
       jobTitle: jobTitle?.trim() || null,
       company: company?.trim() || null,
@@ -220,10 +227,13 @@ export async function PATCH(request: NextRequest) {
       }, { status: 400 });
     }
 
-    // Check if application exists
+    // Check if application exists and belongs to user
     const existingApplication = await db.select()
       .from(applications)
-      .where(eq(applications.id, parseInt(id)))
+      .where(and(
+        eq(applications.id, parseInt(id)),
+        eq(applications.userId, user.id)
+      ))
       .limit(1);
 
     if (existingApplication.length === 0) {
@@ -234,7 +244,10 @@ export async function PATCH(request: NextRequest) {
       .set({
         status: status.trim()
       })
-      .where(eq(applications.id, parseInt(id)))
+      .where(and(
+        eq(applications.id, parseInt(id)),
+        eq(applications.userId, user.id)
+      ))
       .returning();
 
     return NextResponse.json(updated[0]);
@@ -263,10 +276,13 @@ export async function DELETE(request: NextRequest) {
       }, { status: 400 });
     }
 
-    // Check if application exists
+    // Check if application exists and belongs to user
     const existingApplication = await db.select()
       .from(applications)
-      .where(eq(applications.id, parseInt(id)))
+      .where(and(
+        eq(applications.id, parseInt(id)),
+        eq(applications.userId, user.id)
+      ))
       .limit(1);
 
     if (existingApplication.length === 0) {
@@ -274,7 +290,10 @@ export async function DELETE(request: NextRequest) {
     }
 
     const deleted = await db.delete(applications)
-      .where(eq(applications.id, parseInt(id)))
+      .where(and(
+        eq(applications.id, parseInt(id)),
+        eq(applications.userId, user.id)
+      ))
       .returning();
 
     return NextResponse.json({

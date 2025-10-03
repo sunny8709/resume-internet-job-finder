@@ -2,6 +2,7 @@ import { sqliteTable, integer, text } from 'drizzle-orm/sqlite-core';
 
 export const resumes = sqliteTable('resumes', {
   id: integer('id').primaryKey({ autoIncrement: true }),
+  userId: text('user_id').notNull().references(() => user.id, { onDelete: "cascade" }),
   resumeText: text('resume_text'),
   skills: text('skills', { mode: 'json' }),
   fileName: text('file_name'),
@@ -12,6 +13,7 @@ export const resumes = sqliteTable('resumes', {
 
 export const jobs = sqliteTable('jobs', {
   id: integer('id').primaryKey({ autoIncrement: true }),
+  userId: text('user_id').notNull().references(() => user.id, { onDelete: "cascade" }),
   title: text('title').notNull(),
   company: text('company').notNull(),
   location: text('location'),
@@ -26,6 +28,7 @@ export const jobs = sqliteTable('jobs', {
 
 export const applications = sqliteTable('applications', {
   id: integer('id').primaryKey({ autoIncrement: true }),
+  userId: text('user_id').notNull().references(() => user.id, { onDelete: "cascade" }),
   jobId: integer('job_id').references(() => jobs.id),
   jobTitle: text('job_title'),
   company: text('company'),
@@ -37,6 +40,7 @@ export const applications = sqliteTable('applications', {
 
 export const userProfile = sqliteTable('user_profile', {
   id: integer('id').primaryKey({ autoIncrement: true }),
+  userId: text('user_id').notNull().unique().references(() => user.id, { onDelete: "cascade" }),
   email: text('email'),
   phone: text('phone'),
   linkedin: text('linkedin'),

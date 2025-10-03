@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
 import { applications } from '@/db/schema';
-import { sql, desc } from 'drizzle-orm';
+import { sql, desc, eq, and } from 'drizzle-orm';
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 
@@ -25,17 +25,19 @@ export async function GET(request: NextRequest) {
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
     const sevenDaysAgoIso = sevenDaysAgo.toISOString();
 
-    // Get total count
+    // Get total count for user
     const totalResult = await db.select({ 
       count: sql<number>`count(*)` 
-    }).from(applications);
+    }).from(applications)
+      .where(eq(applications.userId, user.id));
     const total = totalResult[0]?.count || 0;
 
-    // Get count by status
+    // Get count by status for user
     const statusResult = await db.select({
       status: applications.status,
       count: sql<number>`count(*)`
     }).from(applications)
+      .where(eq(applications.userId, user.id))
       .groupBy(applications.status);
 
     const byStatus = {
@@ -54,19 +56,25 @@ export async function GET(request: NextRequest) {
     const totalCompleted = byStatus.success + byStatus.failed;
     const successRate = totalCompleted > 0 ? Math.round((byStatus.success / totalCompleted) * 100) : 0;
 
-    // Get recent applications (last 7 days)
+    // Get recent applications (last 7 days) for user
     const recentResult = await db.select({ 
       count: sql<number>`count(*)` 
     }).from(applications)
-      .where(sql`${applications.createdAt} >= ${sevenDaysAgoIso}`);
+      .where(and(
+        eq(applications.userId, user.id),
+        sql`${applications.createdAt} >= ${sevenDaysAgoIso}`
+      ));
     const recent = recentResult[0]?.count || 0;
 
-    // Get applications by company
+    // Get applications by company for user
     const companyResult = await db.select({
       company: applications.company,
       count: sql<number>`count(*)`
     }).from(applications)
-      .where(sql`${applications.company} IS NOT NULL AND ${applications.company} != ''`)
+      .where(and(
+        eq(applications.userId, user.id),
+        sql`${applications.company} IS NOT NULL AND ${applications.company} != ''`
+      ))
       .groupBy(applications.company)
       .orderBy(desc(sql`count(*)`));
 

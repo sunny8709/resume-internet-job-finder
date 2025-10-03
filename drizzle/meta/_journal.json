@@ -15,6 +15,13 @@
       "when": 1759508240330,
       "tag": "0001_little_anita_blake",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1759513207699,
+      "tag": "0002_loving_mongu",
+      "breakpoints": true
     }
   ]
 }
