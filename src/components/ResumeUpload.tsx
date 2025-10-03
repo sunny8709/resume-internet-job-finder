@@ -6,6 +6,12 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/hooks/use-toast"
+import * as pdfjsLib from 'pdfjs-dist'
+
+// Set up PDF.js worker
+if (typeof window !== 'undefined') {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`
+}
 
 interface ResumeUploadProps {
   onSkillsExtracted: (skills: string[]) => void
@@ -53,59 +59,94 @@ export const ResumeUpload = ({ onSkillsExtracted, onResumeUploaded }: ResumeUplo
     return foundSkills
   }
 
+  const extractTextFromPDF = async (file: File): Promise<string> => {
+    try {
+      const arrayBuffer = await file.arrayBuffer()
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise
+      let fullText = ""
+
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i)
+        const textContent = await page.getTextContent()
+        const pageText = textContent.items
+          .map((item: any) => item.str)
+          .join(" ")
+        fullText += pageText + " "
+      }
+
+      return fullText
+    } catch (error) {
+      console.error('Error extracting text from PDF:', error)
+      throw new Error('Failed to extract text from PDF')
+    }
+  }
+
   const processFile = async (file: File) => {
     setIsProcessing(true)
     
-    const reader = new FileReader()
-    reader.onload = async (e) => {
-      try {
-        const text = e.target?.result as string
-        setResumeText(text)
-        
-        const skills = extractSkillsFromText(text)
-        setExtractedSkills(skills)
-        
-        // Save to database with authentication
-        const token = localStorage.getItem("bearer_token")
-        const response = await fetch('/api/resumes', {
-          method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            fileName: file.name,
-            resumeText: text,
-            skills: skills,
-            fileSize: file.size,
-            fileType: file.type
-          })
-        })
-
-        if (!response.ok) {
-          throw new Error('Failed to save resume')
-        }
-
-        onSkillsExtracted(skills)
-        onResumeUploaded(text)
-        
-        toast({
-          title: "Resume uploaded successfully",
-          description: `Found ${skills.length} skills in your resume.`
-        })
-      } catch (error) {
-        console.error('Error processing resume:', error)
-        toast({
-          title: "Error uploading resume",
-          description: "Failed to save resume to database.",
-          variant: "destructive"
-        })
-      } finally {
-        setIsProcessing(false)
+    try {
+      let text = ""
+      
+      // Handle PDF files
+      if (file.type === "application/pdf") {
+        text = await extractTextFromPDF(file)
+      } 
+      // Handle text files
+      else if (file.type === "text/plain") {
+        text = await file.text()
       }
+      // Handle DOC/DOCX (read as text - may not be perfect but better than nothing)
+      else {
+        text = await file.text()
+      }
+
+      setResumeText(text)
+      
+      const skills = extractSkillsFromText(text)
+      setExtractedSkills(skills)
+      
+      // Save to database with authentication
+      const token = localStorage.getItem("bearer_token")
+      const response = await fetch('/api/resumes', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          fileName: file.name,
+          resumeText: text,
+          skills: skills,
+          fileSize: file.size,
+          fileType: file.type
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to save resume')
+      }
+
+      onSkillsExtracted(skills)
+      onResumeUploaded(text)
+      
+      toast({
+        title: "Resume uploaded successfully",
+        description: `Found ${skills.length} skills in your resume.`
+      })
+    } catch (error) {
+      console.error('Error processing resume:', error)
+      toast({
+        title: "Error uploading resume",
+        description: error instanceof Error ? error.message : "Failed to process resume file.",
+        variant: "destructive"
+      })
+      // Reset on error
+      setUploadedFile(null)
+      setExtractedSkills([])
+      setResumeText("")
+    } finally {
+      setIsProcessing(false)
     }
-    
-    reader.readAsText(file)
   }
 
   const handleDrop = useCallback((e: React.DragEvent) => {
