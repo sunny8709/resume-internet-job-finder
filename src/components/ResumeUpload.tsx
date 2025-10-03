@@ -6,12 +6,6 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/hooks/use-toast"
-import * as pdfjsLib from 'pdfjs-dist'
-
-// Set up PDF.js worker
-if (typeof window !== 'undefined') {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`
-}
 
 interface ResumeUploadProps {
   onSkillsExtracted: (skills: string[]) => void
@@ -59,50 +53,47 @@ export const ResumeUpload = ({ onSkillsExtracted, onResumeUploaded }: ResumeUplo
     return foundSkills
   }
 
-  const extractTextFromPDF = async (file: File): Promise<string> => {
-    try {
-      const arrayBuffer = await file.arrayBuffer()
-      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise
-      let fullText = ""
-
-      for (let i = 1; i <= pdf.numPages; i++) {
-        const page = await pdf.getPage(i)
-        const textContent = await page.getTextContent()
-        const pageText = textContent.items
-          .map((item: any) => item.str)
-          .join(" ")
-        fullText += pageText + " "
-      }
-
-      return fullText
-    } catch (error) {
-      console.error('Error extracting text from PDF:', error)
-      throw new Error('Failed to extract text from PDF')
-    }
-  }
-
   const processFile = async (file: File) => {
     setIsProcessing(true)
     
     try {
       let text = ""
       
-      // Handle PDF files
-      if (file.type === "application/pdf") {
-        text = await extractTextFromPDF(file)
-      } 
-      // Handle text files
-      else if (file.type === "text/plain") {
-        text = await file.text()
+      // Extract text using server-side API
+      const formData = new FormData()
+      formData.append("file", file)
+      
+      const extractResponse = await fetch('/api/extract-text', {
+        method: 'POST',
+        body: formData
+      })
+
+      if (!extractResponse.ok) {
+        throw new Error('Failed to extract text from file')
       }
-      // Handle DOC/DOCX (read as text - may not be perfect but better than nothing)
-      else {
-        text = await file.text()
+
+      const { text: extractedText } = await extractResponse.json()
+      text = extractedText
+
+      if (!text || text.trim().length === 0) {
+        throw new Error('No text content found in the file')
       }
 
       setResumeText(text)
       
       const skills = extractSkillsFromText(text)
+      
+      if (skills.length === 0) {
+        toast({
+          title: "No skills detected",
+          description: "We couldn't find any matching skills. Try uploading a different resume format.",
+          variant: "destructive"
+        })
+        setUploadedFile(null)
+        setIsProcessing(false)
+        return
+      }
+      
       setExtractedSkills(skills)
       
       // Save to database with authentication
@@ -162,6 +153,12 @@ export const ResumeUpload = ({ onSkillsExtracted, onResumeUploaded }: ResumeUplo
           file.type === "text/plain") {
         setUploadedFile(file)
         processFile(file)
+      } else {
+        toast({
+          title: "Invalid file type",
+          description: "Please upload a PDF, DOC, DOCX, or TXT file.",
+          variant: "destructive"
+        })
       }
     }
   }, [])
